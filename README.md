@@ -1,156 +1,75 @@
 # Tour into Picture
 
-<div class="gallery">
-    <figure>
-        <img src="result/moffit.gif" alt="Moffit">
-        <figcaption>3D Animation</figcaption>
-    </figure>
-    <style>
-        .gallery {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .gallery img {
-            width: 300px;
-            height: auto;
-        }
-        .gallery figure {
-            margin: 10px;
-            text-align: center;
-        }
-    </style>
-</div>
+## Introduction
 
-# 1. Introduction
+This project implements a "tour into picture" algorithm based on the paper [TIP](http://graphics.cs.cmu.edu/courses/15-463/2011_fall/Papers/TIP.pdf). The algorithm assumes the world is a box and the camera is perpendicular to one of its faces. The project includes a GUI for image annotation and integration with [Blender](https://www.blender.org/) for 3D visualization.
 
-This is a simple project following the paper [TIP](http://graphics.cs.cmu.edu/courses/15-463/2011_fall/Papers/TIP.pdf) to implement a tour into picture algorithm.
+Example of a 2D image and its conversion to 3D using the algorithm:
+| 3D Image | 2D Model |
+| --- | --- |
+| ![Moffit](result/moffit.gif) *Moffitt Library* | ![Moffit Image](data/moffit.jpg) |
 
-This algorithm is based on a simple assumption that the world is a box, and the camera is perpendicular to the box. For example, the following picture is a painting of a room, and the camera is perpendicular to the wall:
+## Usage
 
-![](./data/room.jpg)
+### Dependencies
 
-Then, we can build a 3D model of the room by calculating the corners of the room.
+- Python 3.7 or higher
+- NumPy
+- OpenCV-Python
+- Matplotlib
+- Blender (with "Import-Export: Import Images as Planes" addon)
 
-To get the vanishing point and front wall, I designed a simple GUI to annotate images. The GUI is shown below:
+### Running the Program
 
-![](./images/gui.png)
-
-To visualize the 3D model, I integrate the program with [blender](https://www.blender.org/). If running the program in blender script, it will automatically generate a scene in blender. User can use blender to render the scene and check the result.
-
-# 2. Method
-
-Under the algorithm's assumption, all parallel lines that perpendicular to the camera will be intersected at the same point, which is called the vanishing point as you can see in the example above.
-
-Since monocular camera will inevitably introduce scale ambiguity, we can just choose any suitable z-axis of the front wall in camera coordinate system. Then, we can get the 3D coordinate of the front wall with a calibrated camera.
-
-After that, we can get the 3D coordinate of all other walls (left, right, ceiling, and floor) by assuming the image plane is just the back wall of the room.
-
-To get the texture of the room, we need to use homography to project the image to the 3D model.
-
-The algorithm is simple, we just need to divide the image into 5 piece according to the vanishing point and the front wall. Then, taking left wall as an example, we can get the homography matrix by using the 4 corners of the left wall and the 4 corners located on the left side of the image. After that, we can warp the image to the left wall.
-
-Then, we can get the texture of all other walls (front, left, right, ceiling, and floor) by using the same method.
-
-# 3. Usage
-
-## 3.1. Dependencies
-
-- python3.7 (or higher)
-- numpy
-- opencv-python
-- matplotlib
-- blender with addon "Import-Export: Import Images as Planes"
-
-## 3.2. Run the program
-
-To run the GUI, just run the following command:
-
+To use the GUI for annotation:
 ```bash
 python app.py
 ```
 
-To recontruct the 3D model, run the following command:
-
+To reconstruct the 3D model:
 ```bash
 python main.py
 ```
 
-To run the program in blender, please paste `main.py` to the blender text editor and run it.
+For Blender integration, paste `main.py` into the Blender text editor and run it.
+
+## GUI Interface
+
+The GUI allows users to draw rectangles to indicate the front wall and select the vanishing point. Annotations can be saved for further processing. 
+
+![GUI](images/gui.png)
 
 
-# 4. GUI interface
+## 3D Animation & Results
 
-To get the vanishing point and front wall, I designed a simple GUI to annotate images.
+The program generates a 3D box model in Blender. Below are examples of the generated 3D scenes:
 
-User can draw a rectangle on the image to indicate the front wall, and then select the vanishing point.
+| Result | Original Image |
+| --- | --- |
+| ![Office](result/office.gif) *Berkeley School of Education* | ![Office Image](data/office.jpg) |
+| ![Moffit](result/moffit.gif) *Moffitt Library* | ![Moffit Image](data/moffit.jpg) |
+| ![Corridor](result/corridor.gif) *Moffitt Library Corridor* | ![Corridor Image](data/corridor.jpg) |
 
-After that, user can click on "Save" button to save the annotation to a text file.
+## Method
 
-# 5. 3D Animation & Result
+The core of the 'Tour into Picture' algorithm lies in its unique approach to 3D reconstruction from a single image. The method hinges on a fundamental assumption: the world is a 'box', and the camera capturing the image is perpendicular to one of the box's walls (usually the front wall).
 
-The program will generate a box in blender. User can use blender to render the scene and check the result.
+## Vanishing Point and Perspective
 
-Here are three examples:
+In any given scene, lines that are parallel in the real world but appear to converge in an image, meet at what's called the vanishing point. The algorithm leverages this concept to reconstruct three-dimensional space from a two-dimensional photo. By identifying the vanishing point in an image, we can delineate the perspective and spatial orientation of the scene.
 
-<div class="gallery">
-    <figure>
-        <img src="result/office.gif" alt="office">
-        <figcaption>Shot at Berkeley School of Education</figcaption>
-    </figure>
-    <figure>
-        <img src="result/moffit.gif" alt="Moffit">
-        <figcaption>Shot at Moffitt Library</figcaption>
-    </figure>
-    <figure>
-        <img src="result/corridor.gif" alt="corridor">
-        <figcaption>Shot at Moffitt Library</figcaption>
-    </figure>
-    <style>
-        .gallery {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .gallery img {
-            width: 200px;
-            height: auto;
-        }
-        .gallery figure {
-            margin: 10px;
-            text-align: center;
-        }
-    </style>
-</div>
+## Scale Ambiguity and Camera Calibration
 
-These result are generated by the following images:
+Due to the inherent scale ambiguity in monocular images (images captured with a single lens), the algorithm employs a calibrated camera model. This allows us to select a suitable z-axis depth for the front wall. With the camera's calibration and the identified vanishing point, we can accurately map the 3D coordinates of the front wall.
 
-<div class="gallery">
-    <figure>
-        <img src="data/office.jpg" alt="office">
-        <figcaption>Shot at Berkeley School of Education</figcaption>
-    </figure>
-    <figure>
-        <img src="data/moffit.jpg" alt="Moffit">
-        <figcaption>Shot at Moffitt Library</figcaption>
-    </figure>
-    <figure>
-        <img src="data/corridor.jpg" alt="corridor">
-        <figcaption>Shot at Moffitt Library</figcaption>
-    </figure>
-    <style>
-        .gallery {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .gallery img {
-            width: 200px;
-            height: auto;
-        }
-        .gallery figure {
-            margin: 10px;
-            text-align: center;
-        }
-    </style>
-</div>
+## Spatial Reconstruction
+
+Once the front wall's coordinates are established, we can extend the model to other walls: left, right, ceiling, and floor. We can treat the image plane as the rear wall of the 'box', enabling a complete 3D spatial model of the scene.
+
+## Texture Mapping through Homography
+
+The final step involves applying textures to the 3D model. This is achieved through homography. We can divide the image into five sections (as shown in the following figure) based on the vanishing point and front wall. For each wall (e.g., the left wall), a homography matrix is computed using the wall's four corners and corresponding image sections. This allows us to warp the image texture accurately onto each wall surface.
+
+![room](data/room.jpg)
+
+By following these steps, the algorithm transforms a flat image into a navigable 3D space, offering an immersive 'tour' into the picture.

@@ -5,7 +5,7 @@
 This project implements a "tour into picture" algorithm based on the paper [TIP](http://graphics.cs.cmu.edu/courses/15-463/2011_fall/Papers/TIP.pdf). The algorithm assumes the world is a box and the camera is perpendicular to one of its faces. The project includes a GUI for image annotation and integration with [Blender](https://www.blender.org/) for 3D visualization.
 
 Example of a 2D image and its conversion to 3D using the algorithm:
-| 3D Image | 2D Model |
+| 3D Model | 2D Image |
 | --- | --- |
 | ![Moffit](result/moffit.gif) *Moffitt Library* | ![Moffit Image](data/moffit.jpg) |
 
